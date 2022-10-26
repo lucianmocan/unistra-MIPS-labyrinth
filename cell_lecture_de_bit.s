@@ -56,10 +56,8 @@ sw $ra 0($sp)
 sw $a0 4($sp) #bit a changer 
 sw $a1 8($sp) #n
 #corps
-li $t0 0
-loop:
-bge $t0 32 fin 
-beq $t0 $a0 loop 
+jal function_bis
+and $v0 $v0 $a1
 #epilogue
 lw $ra 0($sp)
 lw $a0 4($sp)
@@ -85,3 +83,28 @@ lw $ra 0($sp)
 lw $a0 4($sp)
 addi $sp $sp 8
 jr $ra
+
+function_bis:
+#prologue
+addi $sp $sp -8
+sw $ra 0($sp)
+sw $a0 4($sp)
+#corps
+li $t0 0
+li $t1 0
+li $t2 31 
+sub $t2 $t2 $a0
+loop_funtcion_bis:
+bge $t1 31 fin_function_bis
+sll $t0 $t0 1
+addi $t1 $t1 1
+beq $t1 $t2 loop_funtcion_bis
+addi $t0 $t0 1
+b loop_funtcion_bis
+fin_function_bis:
+move $v0 $t0 
+#epilogue 
+lw $ra 0($sp)
+lw $a0 4($sp)
+addi $sp $sp 8
+jr $ra 
