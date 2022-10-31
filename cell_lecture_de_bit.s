@@ -6,7 +6,7 @@
 main:
 li $a0 7
 li $a1 127
-jal mettre_bit_a_1
+jal cell_mettre_bit_a_0
 move $a0 $v0 
 li $v0 1 
 syscall 
@@ -29,9 +29,9 @@ lw $ra 0($sp)
 lw $a0 4($sp)
 lw $a1 8($sp)
 addi $sp $sp 12
-jr $ra
+jr $ra 
 
-mettre_bit_a_1:
+cell_mettre_bit_a_1:
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -49,15 +49,15 @@ addi $sp $sp 12
 jr $ra 
 
 
-cell_mettre_bit_a0:
+cell_mettre_bit_a_0:
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
-sw $a0 4($sp) #bit a changer 
-sw $a1 8($sp) #n
+sw $a0 4($sp) # position du bit qu'on souhaite changer -> $a0
+sw $a1 8($sp) # l'entier n dont on veut changer le n-ième bit -> $a1
 #corps
-jal function_bis
-and $v0 $v0 $a1
+jal function_bis # fonction qui retourne un entier ou le seul bit à 0 est le n-ième
+and $v0 $v0 $a1 # met le n-ième bit à 0
 #epilogue
 lw $ra 0($sp)
 lw $a0 4($sp)
@@ -73,7 +73,7 @@ sw $a0 4($sp)
 #corps
 li $v0 1 
 loop:
-beqz $a0 fin
+beqz $a0 fin_pow_2
 mul $v0 $v0 2
 addi $a0 $a0 -1 
 b loop
@@ -94,13 +94,13 @@ li $t0 0
 li $t1 0
 li $t2 31 
 sub $t2 $t2 $a0
-loop_funtcion_bis:
+loop_function_bis:
 bge $t1 31 fin_function_bis
 sll $t0 $t0 1
 addi $t1 $t1 1
-beq $t1 $t2 loop_funtcion_bis
+beq $t1 $t2 loop_function_bis
 addi $t0 $t0 1
-b loop_funtcion_bis
+b loop_function_bis
 fin_function_bis:
 move $v0 $t0 
 #epilogue 
