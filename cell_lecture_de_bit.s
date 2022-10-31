@@ -21,9 +21,10 @@ sw $ra 0($sp)
 sw $a0 4($sp) #bit dont on veut connaitre la valeur
 sw $a1 8($sp) #n
 #corps
-srlv $t0 $a0 $a1 
+addi $a0 $a0 -1 # position du n-ieme bit -> $a0
+srlv $t0 $a1 $a0 # obtenir le n-ieme bit en premier bit de poids faible-> $t0
 li $t1 1
-and $v0 $t0 $t1 
+and $v0 $t0 $t1 # mettre tous les bits a 0 sauf le bit recherché
 #epilogue
 lw $ra 0($sp)
 lw $a0 4($sp)
