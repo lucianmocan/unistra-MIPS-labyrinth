@@ -18,18 +18,18 @@ cell_lecture_de_bits:
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
-sw $a0 4($sp) #bit dont on veut connaitre la valeur
-sw $a1 8($sp) #n
+sw $a0 4($sp) # position du n-ieme bit -> $a0
+sw $a1 8($sp) # l'entier n dont on veut connaitre le n-ieme bit -> $a1
 #corps
-srlv $t0 $a0 $a1 
+srlv $t0 $a1 $a0 # obtenir le n-ieme bit en premier bit de poids faible-> $t0
 li $t1 1
-and $v0 $t0 $t1 
+and $v0 $t0 $t1 # mettre tous les bits a 0 sauf le bit recherché
 #epilogue
 lw $ra 0($sp)
 lw $a0 4($sp)
 lw $a1 8($sp)
 addi $sp $sp 12
-jr $ra 
+jr $ra
 
 mettre_bit_a1:
 #prologue
