@@ -31,16 +31,16 @@ lw $a1 8($sp)
 addi $sp $sp 12
 jr $ra
 
-mettre_bit_a1:
+mettre_bit_a_1:
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
-sw $a0 4($sp) #bit a changer 
-sw $a1 8($sp) #n
+sw $a0 4($sp) # position du bit qu'on souhaite changer -> $a0
+sw $a1 8($sp) # l'entier n dont on veut changer le n-ième bit -> $a1
 #corps
-jal power 
-move $t0 $v0
-or $v0 $a1 $t0  
+jal pow_2 # fonction qui calcule la n($a0)-ième puissance de 2
+move $t0 $v0 # puissance de 2, le seul a bit à 1 est le n-ième
+or $v0 $a1 $t0  # on met le n($a0)-ième bit à 1 
 #epilogue
 lw $ra 0($sp)
 lw $a0 4($sp)
@@ -65,7 +65,7 @@ lw $a1 8($sp)
 addi $sp $sp 12
 jr $ra 
 
-power:
+pow_2:
 #prologue
 addi $sp $sp -8 
 sw $ra 0($sp) 
@@ -78,7 +78,7 @@ mul $v0 $v0 2
 addi $a0 $a0 -1 
 b loop
 #epilogue
-fin:
+fin_pow_2:
 lw $ra 0($sp)
 lw $a0 4($sp)
 addi $sp $sp 8
