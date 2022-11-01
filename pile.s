@@ -15,6 +15,7 @@ sw $t1 4($a0)
 sw $t1 8($a0)
 sw $t1 12($a0)
 jal st_empiler
+jal st_depiler
 jal st_est_pleine
 move $a0, $v0
 li $v0, 1
@@ -122,3 +123,24 @@ lw $a0 4($sp)
 lw $a1 8($sp)
 addi $sp $sp 12
 jr $ra
+
+st_depiler:
+#prologue
+addi $sp $sp -8
+sw $ra 0($sp)
+sw $a0 4($sp)
+#corps
+loop_st_depiler:
+move $t0 $a0 
+addi $t0 $t0 4 
+lw $t1 0($t0)
+beqz $t1 fin_st_depiler
+addi $a0 $a0 4
+b loop_st_depiler
+fin_st_depiler:
+sw $zero 0($a0) 
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+addi $sp $sp 8
+jr $ra 
