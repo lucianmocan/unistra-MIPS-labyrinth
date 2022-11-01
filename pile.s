@@ -110,13 +110,13 @@ sw $ra 0($sp)
 sw $a0 4($sp)
 sw $a1 8($sp)
 #corps
-loop_st_empiler:
-lw $t0 0($a0)
-beqz $t0 fin_st_empiler
-addi $a0 $a0 4
-b loop_st_empiler
+loop_st_empiler: #parcours de la pile
+lw $t0 0($a0) 
+beqz $t0 fin_st_empiler #test si $a0 pointe toujours sur un élément non vide de la pile 
+addi $a0 $a0 4 #incrémentation du pointeur
+b loop_st_empiler 
 fin_st_empiler:
-sw $a1 0($a0)
+sw $a1 0($a0) #empilement 
 #epilogue
 lw $ra 0($sp)
 lw $a0 4($sp)
@@ -132,13 +132,13 @@ sw $a0 4($sp)
 #corps
 loop_st_depiler:
 move $t0 $a0 
-addi $t0 $t0 4 
-lw $t1 0($t0)
-beqz $t1 fin_st_depiler
-addi $a0 $a0 4
+addi $t0 $t0 4 #élémenbt suivant $a0 
+lw $t1 0($t0) #valeur de l'élément suivant $a0
+beqz $t1 fin_st_depiler #test de l'élément suivant $a0  
+addi $a0 $a0 4 #$a0 n'est pas le sommet donc incrémentation du pointeur 
 b loop_st_depiler
-fin_st_depiler:
-sw $zero 0($a0) 
+fin_st_depiler: #$a0 pointe sur le sommet 
+sw $zero 0($a0) #dépilement  
 #epilogue
 lw $ra 0($sp)
 lw $a0 4($sp)
