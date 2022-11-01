@@ -65,11 +65,11 @@ lw $a1 8($sp)
 addi $sp $sp 12
 jr $ra 
 
-pow_2:
+pow_2: #fonction initialisant le n-ième bit à 1 
 #prologue
 addi $sp $sp -8 
 sw $ra 0($sp) 
-sw $a0 4($sp)
+sw $a0 4($sp) #bit à initialiser à 1
 #corps
 li $v0 1 
 loop:
@@ -84,18 +84,18 @@ lw $a0 4($sp)
 addi $sp $sp 8
 jr $ra
 
-function_bis:
+function_bis: #mettre tout les bits à 1 sauf le n-ième 
 #prologue
 addi $sp $sp -8
 sw $ra 0($sp)
-sw $a0 4($sp)
+sw $a0 4($sp) #bit à mettre à zéro 
 #corps
 li $t0 0
 li $t1 0
 li $t2 31 
-sub $t2 $t2 $a0
+sub $t2 $t2 $a0 
 loop_function_bis:
-bge $t1 31 fin_function_bis
+bge $t1 31 fin_function_bis 
 sll $t0 $t0 1
 addi $t1 $t1 1
 beq $t1 $t2 loop_function_bis
