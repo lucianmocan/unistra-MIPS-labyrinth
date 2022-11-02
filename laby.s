@@ -1,5 +1,4 @@
 
-
 .data
 space: .asciiz " "
 new_line: .asciiz "\n"
@@ -18,8 +17,7 @@ li $v0, 4
 syscall
 li $a0, 5
 addi $a2 $zero 2
-addi $a3 $zero 3
-jal cell_i_j_data
+jal cell_i_data
 move $a0, $v0
 li $v0, 1
 syscall
@@ -27,7 +25,7 @@ la $a0, new_line
 li $v0, 4
 syscall
 li $a0, 52
-jal cell_i_j_update
+jal cell_i_update
 li $a0, 5
 jal affiche_laby
 move $a0 $a1 
@@ -197,21 +195,16 @@ jr $ra
 
 
 
-
-cell_i_j_update:
+cell_i_update:
 #prologue
 addi $sp $sp -20
 sw $ra 0($sp)
 sw $a0 4($sp) # valeur à mettre à la place
 sw $a1 8($sp) # adresse du premier element du tableau
 sw $a2 12($sp) # indice i du cellule
-sw $a3 16($sp) # indice j du cellule
 #corps
-mul $t0 $s0 $a2
-mul $t0 $t0 4
-mul $t1 $a3 4
-add $t2 $t0 $t1
-add $a1 $a1 $t2
+mul $t0 $a2 4
+add $a1 $a1 $t0
 sw $a0 0($a1)
 #epilogue
 lw $ra 0($sp)
@@ -222,7 +215,7 @@ lw $a3 16($sp)
 addi $sp $sp 20
 jr $ra
 
-cell_i_j_data:
+cell_i_data:
 #prologue
 addi $sp $sp -16
 sw $ra 0($sp)
@@ -230,11 +223,8 @@ sw $a1 4($sp) # adresse du premier element du tableau
 sw $a2 8($sp) # indice i du cellule
 sw $a3 12($sp) # indice j du cellule
 #corps
-mul $t0 $s0 $a2
-mul $t0 $t0 4
-mul $t1 $a3 4
-add $t2 $t0 $t1
-add $a1 $a1 $t2
+mul $t0 $a2 4
+add $a1 $a1 $t0
 lw $v0 0($a1)
 #epilogue
 lw $ra 0($sp)
@@ -242,7 +232,7 @@ lw $a1 4($sp)
 lw $a2 8($sp)
 lw $a3 12($sp)
 addi $sp $sp 16
-jr $ra
+jr $
 
 init_laby:
 #prologue
