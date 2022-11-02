@@ -13,7 +13,22 @@ syscall
 li $v0 10 
 syscall 
 
-
+cell_lecture_de_bits:
+#prologue
+addi $sp $sp -12
+sw $ra 0($sp)
+sw $a0 4($sp) # position du n-ieme bit -> $a0
+sw $a1 8($sp) # l'entier n dont on veut connaitre le n-ieme bit -> $a1
+#corps
+srlv $t0 $a1 $a0 # obtenir le n-ieme bit en premier bit de poids faible-> $t0
+li $t1 1
+and $v0 $t0 $t1 # mettre tous les bits a 0 sauf le bit recherchÃ©
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+lw $a1 8($sp)
+addi $sp $sp 12
+jr $ra 
 
 
 cell_mettre_bit_a_1:
@@ -50,11 +65,11 @@ lw $a1 8($sp)
 addi $sp $sp 12
 jr $ra 
 
-pow_2: #fonction initialisant le n-ième bit à 1 
+pow_2: #fonction initialisant le n-ime bit  1 
 #prologue
 addi $sp $sp -8 
 sw $ra 0($sp) 
-sw $a0 4($sp) #bit à initialiser à 1
+sw $a0 4($sp) #bit  initialiser  1
 #corps
 li $v0 1 
 loop:
@@ -69,11 +84,11 @@ lw $a0 4($sp)
 addi $sp $sp 8
 jr $ra
 
-function_bis: #mettre tout les bits à 1 sauf le n-ième 
+function_bis: #mettre tout les bits  1 sauf le n-ime 
 #prologue
 addi $sp $sp -8
 sw $ra 0($sp)
-sw $a0 4($sp) #bit à mettre à zéro 
+sw $a0 4($sp) #bit  mettre  zro 
 #corps
 li $t0 0
 li $t1 0
