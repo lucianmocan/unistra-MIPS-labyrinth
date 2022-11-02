@@ -1,6 +1,5 @@
 
 
-
 .data
 space: .asciiz " "
 new_line: .asciiz "\n"
@@ -11,7 +10,7 @@ new_line: .asciiz "\n"
 main:
 li $a0, 5
 li $s0, 5 # on sauvegarde la valeur du N, on ne la modifie pas -> $s0
-jal creer_laby
+jal init_laby
 move $a1, $v0 # adresse du tableau -> $a1
 jal affiche_laby
 la $a0, new_line
@@ -44,24 +43,24 @@ syscall
 lab_visited_neighbours:
 addi $sp $sp -12
 sw $ra 0($sp) 
-sw $a0 4($sp) #adresse du la première cellule
+sw $a0 4($sp) #adresse du la premire cellule
 sw $a1 8($sp) #indice de la cellule 
 #corps
-move $t3 $a0 #adresse de la première cellule
+move $t3 $a0 #adresse de la premire cellule
 move $a0 $a1
 jal lab_neighbouring_cells
 move $t0 $v0 #adresse du tableau des voisins
 li $t6 4
 mul $a0 $t6 $t6
 li $v0 9
-syscall  #création du tableau de retour
+syscall  #cration du tableau de retour
 move $t2 $v0 #transfert de l'adresse du tableau de retour
-move $a0 $t3 #addresse de la première cellule
+move $a0 $t3 #addresse de la premire cellule
 lw $t1 0($t0)
 beqz $t1 pas_de_voisin_haut #test si il y a un voisin 
 lw $a1 0($t0) #indice du voisin du haut
 jal cell_est_visite
-sw $v0 0($t2) #stocke 1 si le voisin a été visité 0 sinon
+sw $v0 0($t2) #stocke 1 si le voisin a t visit 0 sinon
 b voisin_de_gauche
 pas_de_voisin_haut:
 sw $zero 0($t2) #pas de voisin donc 0
@@ -70,7 +69,7 @@ lw $t1 4($t0)
 beqz $t1 pas_de_voisin_gauche #test si il y a un voisin 
 lw $a1 4($t0) #indice du voisin de gauche
 jal cell_est_visite
-sw $v0 4($t2)  #stocke 1 si le voisin a été visité 0 sinon
+sw $v0 4($t2)  #stocke 1 si le voisin a t visit 0 sinon
 b voisin_de_droite
 pas_de_voisin_gauche:
 sw $zero 4($t2) #pas de voisin donc 0
@@ -79,7 +78,7 @@ lw $t1 8($t0)
 beqz $t1 pas_de_voisin_droite #test si il y a un voisin 
 lw $a1 8($t0) #indice du voisin de droite 
 jal cell_est_visite
-sw $v0 8($t2)  #stocke 1 si le voisin a été visité 0 sinon
+sw $v0 8($t2)  #stocke 1 si le voisin a t visit 0 sinon
 b voisin_du_bas
 pas_de_voisin_droite:
 sw $zero 8($t2) #pas de voisin donc 0
@@ -88,7 +87,7 @@ lw $t1 12($t0)
 beqz $t1 pas_de_voisin_bas #test si il y a un voisin 
 lw $a1 12($t0) #indice du voisin du bas 
 jal cell_est_visite
-sw $v0 12($t2) #stocke 1 si le voisin a été visité 0 sinon
+sw $v0 12($t2) #stocke 1 si le voisin a t visit 0 sinon
 b fin_lab_visited_neighbours
 pas_de_voisin_bas:
 sw $zero 12($t2) #pas de voisin donc 0
@@ -114,43 +113,43 @@ move $t1 $a0 #transfert de l'indice
 li $t6 4
 mul $a0 $t6 $t6
 li $v0 9
-syscall  #création du tableau de retour 
-move $t2 $v0 #traansfert de l'adresse du premier élément du tableau
-bne $t1 1 last_cell_test #test si la cellule est la première 
+syscall  #cration du tableau de retour 
+move $t2 $v0 #traansfert de l'adresse du premier lment du tableau
+bne $t1 1 last_cell_test #test si la cellule est la premire 
 sw $zero 0($t2) #pas de voisin en-haut 
-sw $zero 4($t2) #pas de voisin à gauche
+sw $zero 4($t2) #pas de voisin  gauche
 addi $t3 $t1 1
 sw $t3 8($t2) #voisin de droite
 add $t3 $t1 $s0 
 sw $t3 12($t2) #voisin d'en-bas 
 b fin_lab_neighbouring_cells
 last_cell_test:
-bne $t1 $t0 not_first_not_last #test si la cellule est la dernière 
-sw $zero 8($t2) #pas de voisin à droite 
+bne $t1 $t0 not_first_not_last #test si la cellule est la dernire 
+sw $zero 8($t2) #pas de voisin  droite 
 sw $zero 12($t2) #pas de voisin en haut 
 subi $t3 $t1 1 
 sw $t3 4($t2) #voisin de gauche
 sub $t3 $t1 $s0 
 sw $t3 0($t2) #voisin d'en-haut
 b fin_lab_neighbouring_cells
-not_first_not_last: #ni la première cellule ni la dernière 
+not_first_not_last: #ni la premire cellule ni la dernire 
 addi $t3 $t1 1
 sw $t3 8($t2) #voisin de droite 
 subi $t3 $t1 1
 sw $t3 4($t2) #voisin de gauche 
 sub $t4 $t0 $s0  
-bge $t1 $t4 last_row #test si la cellule est sur la dernière ligne 
+bge $t1 $t4 last_row #test si la cellule est sur la dernire ligne 
 add $t3 $t1 $s0 
 sw $t3 12($t2) #voisin d'en bas 
 sub $t5 $t1 $s0  
-ble $t5 $zero first_row #test si la cellule est sur la première ligne 
+ble $t5 $zero first_row #test si la cellule est sur la premire ligne 
 sub $t3 $t1 $s0  
 sw $t3 0($t2) #voisin d'en-haut
 b fin_lab_neighbouring_cells
-first_row: #la cellule est sur la première ligne 
+first_row: #la cellule est sur la premire ligne 
 sw $zero 0($t2) #pas de voisin d'en haut 
 b fin_lab_neighbouring_cells
-last_row: #la cellule est sur la dernière ligne 
+last_row: #la cellule est sur la dernire ligne 
 sw $zero 12($t2) #pas de voisin en-bas 
 sub $t3 $t1 $s0 
 sw $t3 0($t2) #voisin du haut 
@@ -245,7 +244,7 @@ lw $a3 12($sp)
 addi $sp $sp 16
 jr $ra
 
-creer_laby:
+init_laby:
 #prologue
 addi $sp $sp -4
 sw $ra 0($sp) 
@@ -255,13 +254,13 @@ jal st_creer # alloue en mÃ©moire le tableau N*N et retourne l'adresse -> $v0
 move $t0 $v0 # l'adresse du premier element du tableau -> $a1
 move $t5 $v0 # sauvegarder l'adresse du tableau pour le retour
 li $t2, 15 # en binaire 15 (F) = 0000 1111 pour 4 murs autour d'une cellule
-li $t1 0 # $t1 compteur pour la boucle for_creer_laby
-for_creer_laby:  beq $t1 $t3 fin_creer_laby
+li $t1 0 # $t1 compteur pour la boucle for_init_laby
+for_init_laby:  beq $t1 $t3 fin_init_laby
 		 sw $t2 0($t0)
 		 addi $t1 $t1 1
 		 addi $t0 $t0 4
-		 b for_creer_laby
-fin_creer_laby:  move $v0 $t5
+		 b for_init_laby
+fin_init_laby:  move $v0 $t5
 #epilogue
 lw $ra 0($sp)
 addi $sp $sp 4
