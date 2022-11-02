@@ -41,6 +41,69 @@ syscall
 li $v0, 10
 syscall
 
+lab_neighbouring_cells:
+#prologue  
+addi $sp $sp -8
+sw $ra 0($sp)
+sw $a0 4($sp) #indice de la cellule 
+#corps
+mul $t0 $s0 $s0 
+move $t1 $a0 #transfert de l'indice
+li $t6 4
+mul $a0 $t6 $t6
+li $v0 9
+syscall  #création du tableau de retour 
+move $t2 $v0 #traansfert de l'adresse du premier élément du tableau
+bne $t1 1 last_cell_test #test si la cellule est la première 
+sw $zero 0($t2) #pas de voisin en-haut 
+sw $zero 4($t2) #pas de voisin à gauche
+addi $t3 $t1 1
+sw $t3 8($t2) #voisin de droite
+add $t3 $t1 $s0 
+sw $t3 12($t2) #voisin d'en-bas 
+b fin_lab_neighbouring_cells
+last_cell_test:
+bne $t1 $t0 not_first_not_last #test si la cellule est la dernière 
+sw $zero 8($t2) #pas de voisin à droite 
+sw $zero 12($t2) #pas de voisin en haut 
+subi $t3 $t1 1 
+sw $t3 4($t2) #voisin de gauche
+sub $t3 $t1 $s0 
+sw $t3 0($t2) #voisin d'en-haut
+b fin_lab_neighbouring_cells
+not_first_not_last: #ni la première cellule ni la dernière 
+addi $t3 $t1 1
+sw $t3 8($t2) #voisin de droite 
+subi $t3 $t1 1
+sw $t3 4($t2) #voisin de gauche 
+sub $t4 $t0 $s0  
+bge $t1 $t4 last_row #test si la cellule est sur la dernière ligne 
+add $t3 $t1 $s0 
+sw $t3 12($t2) #voisin d'en bas 
+sub $t5 $t1 $s0  
+ble $t5 $zero first_row #test si la cellule est sur la première ligne 
+sub $t3 $t1 $s0  
+sw $t3 0($t2) #voisin d'en-haut
+b fin_lab_neighbouring_cells
+first_row: #la cellule est sur la première ligne 
+sw $zero 0($t2) #pas de voisin d'en haut 
+b fin_lab_neighbouring_cells
+last_row: #la cellule est sur la dernière ligne 
+sw $zero 12($t2) #pas de voisin en-bas 
+sub $t3 $t1 $s0 
+sw $t3 0($t2) #voisin du haut 
+b fin_lab_neighbouring_cells
+fin_lab_neighbouring_cells:
+move $v0 $t2 
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+addi $sp $sp 8
+jr $ra
+
+
+
+
 lab_direction_ind:
 #prologue
 addi $sp $sp -16
