@@ -41,6 +41,68 @@ syscall
 li $v0, 10
 syscall
 
+lab_visited_neighbours:
+addi $sp $sp -12
+sw $ra 0($sp) 
+sw $a0 4($sp) #adresse du la premiËre cellule
+sw $a1 8($sp) #indice de la cellule 
+#corps
+move $t3 $a0 #adresse de la premiËre cellule
+move $a0 $a1
+jal lab_neighbouring_cells
+move $t0 $v0 #adresse du tableau des voisins
+li $t6 4
+mul $a0 $t6 $t6
+li $v0 9
+syscall  #crÈation du tableau de retour
+move $t2 $v0 #transfert de l'adresse du tableau de retour
+move $a0 $t3 #addresse de la premiËre cellule
+lw $t1 0($t0)
+beqz $t1 pas_de_voisin_haut #test si il y a un voisin 
+lw $a1 0($t0) #indice du voisin du haut
+jal cell_est_visite
+sw $v0 0($t2) #stocke 1 si le voisin a ÈtÈ visitÈ 0 sinon
+b voisin_de_gauche
+pas_de_voisin_haut:
+sw $zero 0($t2) #pas de voisin donc 0
+voisin_de_gauche:
+lw $t1 4($t0)
+beqz $t1 pas_de_voisin_gauche #test si il y a un voisin 
+lw $a1 4($t0) #indice du voisin de gauche
+jal cell_est_visite
+sw $v0 4($t2)  #stocke 1 si le voisin a ÈtÈ visitÈ 0 sinon
+b voisin_de_droite
+pas_de_voisin_gauche:
+sw $zero 4($t2) #pas de voisin donc 0
+voisin_de_droite:
+lw $t1 8($t0)
+beqz $t1 pas_de_voisin_droite #test si il y a un voisin 
+lw $a1 8($t0) #indice du voisin de droite 
+jal cell_est_visite
+sw $v0 8($t2)  #stocke 1 si le voisin a ÈtÈ visitÈ 0 sinon
+b voisin_du_bas
+pas_de_voisin_droite:
+sw $zero 8($t2) #pas de voisin donc 0
+voisin_du_bas: 
+lw $t1 12($t0)
+beqz $t1 pas_de_voisin_bas #test si il y a un voisin 
+lw $a1 12($t0) #indice du voisin du bas 
+jal cell_est_visite
+sw $v0 12($t2) #stocke 1 si le voisin a ÈtÈ visitÈ 0 sinon
+b fin_lab_visited_neighbours
+pas_de_voisin_bas:
+sw $zero 12($t2) #pas de voisin donc 0
+fin_lab_visited_neighbours:
+move $v0 $t2
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+lw $a1 8($sp)
+addi $sp $sp 12
+jr $ra
+
+
+
 lab_neighbouring_cells:
 #prologue  
 addi $sp $sp -8
@@ -255,3 +317,38 @@ lw $a0 4($sp)
 addi $sp $sp 8
 jr $ra
 
+cell_est_visite:
+#prologue
+addi $sp $sp -12
+sw $ra 0($sp)
+sw $a0 4($sp) # contient l'adresse du premier element du tableau
+sw $a1 8($sp) # indice de la cellule
+#corps
+mul $a1 $a1 4
+add $t0 $a0 $a1 
+lw $a1 0($t0)
+li $a0, 6 # position du bit qu'on veut verifier -> $a0
+jal cell_lecture_de_bits # valeur du 6 bit -> $v0
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+lw $a1 8($sp)
+addi $sp $sp 12
+jr $ra
+
+cell_lecture_de_bits:
+#prologue
+addi $sp $sp -12
+sw $ra 0($sp)
+sw $a0 4($sp) # position du n-ieme bit -> $a0
+sw $a1 8($sp) # l'entier n dont on veut connaitre le n-ieme bit -> $a1
+#corps
+srlv $t0 $a1 $a0 # obtenir le n-ieme bit en premier bit de poids faible-> $t0
+li $t1 1
+and $v0 $t0 $t1 # mettre tous les bits a 0 sauf le bit recherch√©
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+lw $a1 8($sp)
+addi $sp $sp 12
+jr $ra 
