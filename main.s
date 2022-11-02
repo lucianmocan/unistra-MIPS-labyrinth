@@ -1,5 +1,3 @@
-
-
 .data
 
 space: .asciiz " "
@@ -9,7 +7,7 @@ err_mess: .asciiz "Missing argument. Please provide an integer N."
 .text
 
 # $s0 holds N's value 
-#
+# $s1 holds N*N's value
 
 main:		  
 
@@ -20,10 +18,15 @@ cmd_line_args: beqz $a0 exit_err_args     # if no arguments then display error m
 	       la $t0 0($a1)	              # the pointer to the string -> $t0	        
 	       lw $a0 0($t0)		          # the string -> $a0
 	       jal string_to_int	          # string to integer (char*) $a0 -> (int) $v0
-	       move $s0, $a0		          # saves N's value -> $s0	
+	       move $s0, $v0		          # saves N's value -> $s0	
 	       move $a0, $v0		  
 	       li $v0, 1
 	       syscall			              # displays N's value
+	       la $a0, new_line
+	       li $v0, 4
+	       syscall	
+		
+jal creer_laby
 
 exit: li $v0, 10			 
       syscall				              # terminates execution
@@ -35,7 +38,37 @@ exit_err_args:  la $a0, err_mess
 	   	li $v0, 4  
 	   	syscall
 	   	b exit
+
       
+          
+creer_laby:
+#prologue
+addi $sp $sp -8
+sw $ra 0($sp)
+
+
+#corps
+mul $s1 $s0 $s0
+jal init_laby  # creates an array where all of the integers'  4 least significant bits are set to 1
+	       # return the address of the first integer in the array-> $v0
+move $a3 $v0   # saves the adress of the array -> $a3
+
+
+
+
+
+
+move $a1 $a3
+jal affiche_laby
+
+#epilogue
+lw $ra 0($sp)
+addi $sp $sp 8
+jr $ra                            
+                        
+
+                                    
+                                                                                                            
 string_to_int:
 #prologue
 addi $sp $sp -8
@@ -91,3 +124,111 @@ lw $a1 4($sp)
 addi $sp $sp 8
 jr $ra
 
+init_laby:
+#prologue
+addi $sp, $sp, -4
+sw $ra, 0($sp) 
+#corps
+move $t3, $s1 	# stores N*N from $s1 (number of integers in the array) -> $t3
+jal st_creer 	# alloue en mémoire le tableau N*N et retourne l'adresse -> $v0
+move $t0 $v0 	# l'adresse du premier element du tableau -> $a1
+move $t5 $v0 	# sauvegarder l'adresse du tableau pour le retour
+li $t2, 15 	# en binaire 15 (F) = 0000 1111 pour 4 murs autour d'une cellule
+li $t1 0 	# $t1 compteur pour la boucle for_init_laby
+for_init_laby:  beq $t1 $t3 fin_init_laby
+		 sw $t2 0($t0)
+		 addi $t1 $t1 1
+		 addi $t0 $t0 4
+		 b for_init_laby
+fin_init_laby:  move $v0 $t5
+#epilogue
+lw $ra 0($sp)
+addi $sp $sp 4
+jr $ra
+
+affiche_laby:
+#prologue
+addi $sp $sp -12
+sw $ra 0($sp)
+sw $a0 4($sp)
+sw $a1 8($sp)     # contains the address of the array
+#corps
+move $t2, $s0
+li $t0, 0
+for_i_affiche_laby: beq $t0 $t2 fin_affiche_laby
+		    li $t1, 0
+		    for_j_affiche_laby: beq $t1 $t2 fin_for_j_affiche_laby
+		  		        lw $a0 0($a1)
+		  		        li $v0, 1
+		  		        syscall
+		  		        la $a0 space
+		  		        li $v0, 4
+		  		        syscall
+		  		        addi $t1 $t1 1
+		  		        addi $a1 $a1 4
+		  		        b for_j_affiche_laby
+	        fin_for_j_affiche_laby: addi $t0 $t0 1
+	      	  		        la $a0 new_line
+	      			        li $v0, 4
+	      			        syscall
+	      			        b for_i_affiche_laby
+fin_affiche_laby:
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+lw $a1 8($sp)
+addi $sp $sp 12
+jr $ra
+
+cell_i_update:
+#prologue
+addi $sp $sp -16
+sw $ra 0($sp)
+sw $a0 4($sp) # valeur à mettre à la place
+sw $a1 8($sp) # adresse du premier element du tableau
+sw $a2 12($sp) # indice i du cellule
+#corps
+mul $t0 $a2 4
+add $a1 $a1 $t0
+sw $a0 0($a1)
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+lw $a1 8($sp)
+lw $a2 12($sp)
+addi $sp $sp 16
+jr $ra
+
+cell_i_data:
+#prologue
+addi $sp $sp -16
+sw $ra 0($sp)
+sw $a1 4($sp) # adresse du premier element du tableau
+sw $a2 8($sp) # indice i du cellule
+sw $a3 12($sp) # indice j du cellule
+#corps
+mul $t0 $a2 4
+add $a1 $a1 $t0
+lw $v0 0($a1)
+#epilogue
+lw $ra 0($sp)
+lw $a1 4($sp)
+lw $a2 8($sp)
+lw $a3 12($sp)
+addi $sp $sp 16
+jr $
+
+st_creer:
+#prologue
+addi $sp $sp -8
+sw $ra 0($sp)
+sw $a0 4($sp)
+#corps
+mul $a0 $s1 4 	# chaque entier est codé sur 4 octets 
+li $v0, 9 	# allocation sur le tas de $a0 * octets, premiere adresse -> $v0
+syscall
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+addi $sp $sp 8
+jr $ra
