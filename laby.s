@@ -5,6 +5,7 @@
 space: .asciiz " "
 new_line: .asciiz "\n"
 
+
 .text
 
 main:
@@ -30,9 +31,47 @@ li $a0, 52
 jal cell_i_j_update
 li $a0, 5
 jal affiche_laby
-
+move $a0 $a1 
+li $a1 20
+li $a2 15
+jal lab_direction_ind
+move $a0 $v0
+li $v0 1 
+syscall 
 li $v0, 10
 syscall
+
+lab_direction_ind:
+#prologue
+addi $sp $sp -16
+sw $ra 0($sp)
+sw $a0 4($sp) #adresser du labyrinthe
+sw $a1 8($sp) #indice de la cellule c 
+sw $a2 12($sp) #direction 
+#corps
+bne $a2 -1 droite #gauche 
+subi $v0 $a1 1
+b fin_lab_direction_ind
+droite: #droite 
+bne $a2 1 bas 
+addi $v0 $a1 1 
+b fin_lab_direction_ind
+bas: #bas 
+bne $a2 $s0 haut
+add $v0 $a1 $s0 
+b fin_lab_direction_ind
+haut: #haut 
+sub $v0 $a1 $s0 
+fin_lab_direction_ind:
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+lw $a1 8($sp)
+lw $a2 12($sp)
+addi $sp $sp 16
+jr $ra
+
+
 
 
 cell_i_j_update:
