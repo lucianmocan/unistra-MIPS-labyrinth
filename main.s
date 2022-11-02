@@ -130,6 +130,7 @@ addi $sp, $sp, -4
 sw $ra, 0($sp) 
 #corps
 move $t3, $s1 	# stores N*N from $s1 (number of integers in the array) -> $t3
+move $a0, $s1
 jal st_creer 	# alloue en mémoire le tableau N*N et retourne l'adresse -> $v0
 move $t0 $v0 	# l'adresse du premier element du tableau -> $a1
 move $t5 $v0 	# sauvegarder l'adresse du tableau pour le retour
@@ -224,7 +225,7 @@ addi $sp $sp -8
 sw $ra 0($sp)
 sw $a0 4($sp)
 #corps
-mul $a0 $s1 4 	# chaque entier est codé sur 4 octets 
+mul $a0 $a0 4 	# chaque entier est codé sur 4 octets 
 li $v0, 9 	# allocation sur le tas de $a0 * octets, premiere adresse -> $v0
 syscall
 #epilogue
