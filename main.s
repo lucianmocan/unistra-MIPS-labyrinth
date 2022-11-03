@@ -27,6 +27,42 @@ cmd_line_args: beqz $a0 exit_err_args     # if no arguments then display error m
 	       syscall	
 		
 jal creer_laby
+move $s2 $v0 #adresse de la tableau 
+li $s3 1 #indice de la cellule courante 
+move $a0 $s1 
+li $v0 9 
+syscall 
+move $s4 $v0 #adresse du sommet de la pile de cellule 
+move $a0 $s2 
+move $a1 $s3 
+jal est_visite #visite la cellule c0 
+lw $s3 0($s4) #empile de la cellule c0 
+loop_main:
+	move $a0 $s4 
+	jal est_vide 
+	move $t0 $v0 #contient 1 si la pile est vide 0 sinon 
+	beq $t0 1 #test si la pile est vide 
+	move $a0 $s2 
+	move $a1 $s3 
+	jal lab_visited_neighbours
+	move $t1 $v0 #cellules voisines non visitées
+	move $a0 $v0 
+	jal est_vide
+	beqz $v0 voisin_non_visite
+	lw $zero 0($s4) #cas où il n'y a pas de cellule voisine non visité 
+	subi $s4 $s4 4
+	lw $s3 0($s4)
+	b loop_main
+	voisin_non_visite:
+	move $a0 $t1 
+	jal cell_au_hasard
+	move $t2 $v0 #indice de la cellule voisine 
+	#savoir si la cellule voisine est en haut, en bas, a gauche, a droite
+	
+	
+
+
+
 
 exit: li $v0, 10			 
       syscall				              # terminates execution
@@ -231,5 +267,201 @@ syscall
 #epilogue
 lw $ra 0($sp)
 lw $a0 4($sp)
+addi $sp $sp 8
+jr $ra
+
+cell_est_visite:
+#prologue
+addi $sp $sp -12
+sw $ra 0($sp)
+sw $a0 4($sp) # contient l'adresse du premier element du tableau
+sw $a1 8($sp) # indice de la cellule
+#corps
+mul $a1 $a1 4
+add $t0 $a0 $a1 
+lw $a1 0($t0)
+li $a0, 6 # position du bit qu'on veut verifier -> $a0
+jal cell_lecture_de_bits # valeur du 6 bit -> $v0
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+lw $a1 8($sp)
+addi $sp $sp 12
+jr $ra
+
+st_est_vide:
+#prologue
+addi $sp $sp -8
+sw $ra 0($sp)
+sw $a0 4($sp)
+#corps
+lw $t0 0($a0)
+beqz $t0 st_vide
+li $v0, 0
+b fin_st_vide
+st_vide: li $v0, 1
+fin_st_vide:
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+addi $sp $sp 8
+jr $ra
+
+lab_neighbouring_cells:
+#prologue  
+addi $sp $sp -8
+sw $ra 0($sp)
+sw $a0 4($sp) #indice de la cellule 
+#corps
+mul $t0 $s0 $s0 
+move $t1 $a0 #transfert de l'indice
+li $t6 4
+mul $a0 $t6 $t6
+li $v0 9
+syscall  #cration du tableau de retour 
+move $t2 $v0 #traansfert de l'adresse du premier lment du tableau
+bne $t1 1 last_cell_test #test si la cellule est la premire 
+sw $zero 0($t2) #pas de voisin en-haut 
+sw $zero 4($t2) #pas de voisin  gauche
+addi $t3 $t1 1
+sw $t3 8($t2) #voisin de droite
+add $t3 $t1 $s0 
+sw $t3 12($t2) #voisin d'en-bas 
+b fin_lab_neighbouring_cells
+last_cell_test:
+bne $t1 $t0 not_first_not_last #test si la cellule est la dernire 
+sw $zero 8($t2) #pas de voisin  droite 
+sw $zero 12($t2) #pas de voisin en haut 
+subi $t3 $t1 1 
+sw $t3 4($t2) #voisin de gauche
+sub $t3 $t1 $s0 
+sw $t3 0($t2) #voisin d'en-haut
+b fin_lab_neighbouring_cells
+not_first_not_last: #ni la premire cellule ni la dernire 
+addi $t3 $t1 1
+sw $t3 8($t2) #voisin de droite 
+subi $t3 $t1 1
+sw $t3 4($t2) #voisin de gauche 
+sub $t4 $t0 $s0  
+bge $t1 $t4 last_row #test si la cellule est sur la dernire ligne 
+add $t3 $t1 $s0 
+sw $t3 12($t2) #voisin d'en bas 
+sub $t5 $t1 $s0  
+ble $t5 $zero first_row #test si la cellule est sur la premire ligne 
+sub $t3 $t1 $s0  
+sw $t3 0($t2) #voisin d'en-haut
+b fin_lab_neighbouring_cells
+first_row: #la cellule est sur la premire ligne 
+sw $zero 0($t2) #pas de voisin d'en haut 
+b fin_lab_neighbouring_cells
+last_row: #la cellule est sur la dernire ligne 
+sw $zero 12($t2) #pas de voisin en-bas 
+sub $t3 $t1 $s0 
+sw $t3 0($t2) #voisin du haut 
+b fin_lab_neighbouring_cells
+fin_lab_neighbouring_cells:
+move $v0 $t2 
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+addi $sp $sp 8
+jr $ra
+
+lab_visited_neighbours:
+addi $sp $sp -12
+sw $ra 0($sp) 
+sw $a0 4($sp) #adresse du la premire cellule
+sw $a1 8($sp) #indice de la cellule 
+#corps
+move $t3 $a0 #adresse de la premire cellule
+move $a0 $a1
+jal lab_neighbouring_cells
+move $t0 $v0 #adresse du tableau des voisins
+li $t6 4
+mul $a0 $t6 $t6
+li $v0 9
+syscall  #cration du tableau de retour
+move $t2 $v0 #transfert de l'adresse du tableau de retour
+move $t9 $v0 #pointeur
+move $a0 $t3 #addresse de la premire cellule
+lw $t1 0($t0)
+beqz $t1 voisin_de_gauche #test si il y a un voisin 
+lw $a1 0($t0) #indice du voisin du haut
+jal cell_est_visite
+bnez $v0 voisin_de_gauche 
+sw $a1 0($t9)
+addi $t9 $t9 4
+voisin_de_gauche:
+lw $t1 4($t0)
+beqz $t1 voisin_de_droite #test si il y a un voisin 
+lw $a1 4($t0) #indice du voisin de gauche
+jal cell_est_visite
+bnez $v0 voisin_de_droite
+sw $a1 0($t9)
+addi $t9 $t9 4
+voisin_de_droite:
+lw $t1 8($t0)
+beqz $t1 voisin_du_bas #test si il y a un voisin 
+lw $a1 8($t0) #indice du voisin de droite 
+jal cell_est_visite
+bnez $v0 voisin_du_bas
+sw $a1 0($t9)
+addi $t9 $t9 4
+b voisin_du_bas
+voisin_du_bas: 
+lw $t1 12($t0)
+beqz $t1 fin_lab_visited_neighbours #test si il y a un voisin 
+lw $a1 12($t0) #indice du voisin du bas 
+jal cell_est_visite
+bnez $v0 fin_lab_visited_neighbours
+sw $a1 0($t9)
+fin_lab_visited_neighbours:
+move $v0 $t2
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+lw $a1 8($sp)
+addi $sp $sp 12
+jr $ra
+
+cell_au_hasard:
+#prologue
+addi $sp $sp -8
+sw $ra 0($sp)
+sw $a0 4($sp)   # adresse du tableau des voisins
+#corps
+jal tab_size    # la taille du tableau des voisins -> $v0
+move $t2, $v0   # on sauvegarde la taille contenu en $v0 -> $t2
+li $a0, 345     # le pseudorandom -> $a0
+move $a1, $t2   # la borne superieure -> $a1
+li $v0, 42      # generation d'un entier: 0 <= [int] < $a1 -> $a0 
+syscall
+move $t1, $a0   # on sauvegarde le resultat du random int -> $t1
+lw $a0 4($sp)   # on recupere l'adresse du tableau des voisins -> $a0
+add $a0 $a0 $t1 # on trouve l'adresse du bon element dans le tableau -> $a0
+lw $v0 0($a0)   # on retourne l'indice de la cellule choisie au hasard
+#epilogue
+lw $ra 0($sp)
+lw $a0 4($sp)
+addi $sp $sp 8
+jr $ra
+
+
+tab_size: # fonction qui retourne la taille d'un tableau d'entiers
+#prologue
+addi $sp $sp -8
+sw $ra 0($sp)
+sw $a0 4($sp) # l'adresse du tableau
+#corps
+li $t0, 0
+for_i_tab: beq $a0 $zero fin_for
+	   addi $t0 $t0 1
+	   addi $a0 $a0 4
+	   b for_i_tab
+fin_for:   addi $t0, $t0 -1
+	   li $v0, $t0
+#epilogue
+lw $a0 4($sp)
+lw $a0 0($sp)
 addi $sp $sp 8
 jr $ra
