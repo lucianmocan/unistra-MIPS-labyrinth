@@ -25,8 +25,8 @@ main:
 #	       la $a0, new_line
 #	       li $v0, 4
 #	       syscall	
-li $s0, 2
-li $a0, 2
+li $s0, 4
+li $a0, 4
 li $v0, 1
 syscall
 la $a0, new_line
@@ -53,7 +53,7 @@ exit_err_args:  la $a0, err_mess
           
 creer_laby:
 #prologue
-addi $sp $sp -8
+addi $sp $sp -4
 sw $ra 0($sp)
 
 
@@ -127,7 +127,8 @@ voisin_non_visite:
 	move $a1, $s2
 	move $a2, $s7
 	jal cell_i_update
-	addi $s3 $t2 1
+	move $s3 $s7
+	#addi $s3 $t2 1
 	move $a0, $s2
 	move $a1, $s3
 	jal cell_visiter
@@ -144,9 +145,10 @@ fin_creer_laby:
 move $a1 $s2
 jal affiche_laby
 
+
 #epilogue
 lw $ra 0($sp)
-addi $sp $sp 8
+addi $sp $sp 4
 jr $ra                            
                         
 
@@ -176,7 +178,7 @@ end_neighbour_position:
 lw $ra 0($sp) 
 lw $a1 4($sp)
 lw $a2 8($sp)                               
-addi $sp $sp 8
+addi $sp $sp 12
 jr $ra
 
                                                                                                                                                                                                                                                                                                                                                                                                                         
@@ -632,7 +634,7 @@ jr $ra
 
 st_sommet:
 #prologue
-addi $sp $sp -8
+addi $sp $sp -12
 sw $ra 0($sp)
 sw $a0 4($sp) # adresse du tableau
 sw $a1 8($sp) # nombre d'entiers maximal que le tableau peut contenir
@@ -650,7 +652,8 @@ stu_sommet: addi $t5 $t5 -4 # on revient sur la bonne adresse qui est $t5 -> $t5
 #epilogue
 lw $ra 0($sp)
 lw $a0 4($sp)
-addi $sp $sp 8
+lw $a1 8($sp)
+addi $sp $sp 12
 jr $ra
 
 
