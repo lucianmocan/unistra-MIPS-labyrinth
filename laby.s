@@ -14,24 +14,24 @@ main:
 # in cmd_line_args: $a0 is the argument count
 #		            $a1 is the address of array containing pointers to null-terminated argument strings
 # reference: https://courses.missouristate.edu/kenvollmar/mars/Help/Help_4_1/MarsHelpCommand.html
-#cmd_line_args: beqz $a0 exit_err_args     # if no arguments then display error message and exit
-#	       la $t0 0($a1)	              # the pointer to the string -> $t0	        
-#	       lw $a0 0($t0)		          # the string -> $a0
-#	       jal string_to_int	          # string to integer (char*) $a0 -> (int) $v0
-#	       move $s0, $v0		          # saves N's value -> $s0	
-#	       move $a0, $v0		  
-#	       li $v0, 1
-#	       syscall			              # displays N's value
-#	       la $a0, new_line
-#	       li $v0, 4
-#	       syscall	
-li $s0, 4
-li $a0, 4
-li $v0, 1
-syscall
-la $a0, new_line
-li $v0, 4
-syscall	
+cmd_line_args: beqz $a0 exit_err_args     # if no arguments then display error message and exit
+	       la $t0 0($a1)	              # the pointer to the string -> $t0	        
+	       lw $a0 0($t0)		          # the string -> $a0
+	       jal string_to_int	          # string to integer (char*) $a0 -> (int) $v0
+	       move $s0, $v0		          # saves N's value -> $s0	
+	       move $a0, $v0		  
+	       li $v0, 1
+	       syscall			              # displays N's value
+	       la $a0, new_line
+	       li $v0, 4
+	       syscall	
+#li $s0, 4
+#li $a0, 4
+#li $v0, 1
+#syscall
+#la $a0, new_line
+#li $v0, 4
+#syscall	
 						
 jal creer_laby
 	
@@ -139,7 +139,27 @@ voisin_non_visite:
 j loop_main	
 	
 
-fin_creer_laby:
+fin_creer_laby: move $a1, $s2
+		li $a2, 1
+		jal cell_i_data
+		move $a1, $v0
+		li $a0, 5
+		jal cell_mettre_bit_a_1
+		move $a0, $v0
+		move $a1, $s2
+		li $a2, 1
+		jal cell_i_update
+		
+		move $a1, $s2
+		move $a2, $s1
+		jal cell_i_data
+		move $a1, $v0
+		li $a0, 4
+		jal cell_mettre_bit_a_1
+		move $a0, $v0
+		move $a1, $s2
+		move $a2, $s1
+		jal cell_i_update
 
 
 move $a1 $s2
