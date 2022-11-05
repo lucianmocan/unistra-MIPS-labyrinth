@@ -161,7 +161,7 @@ jr $ra
 #                    3.1 La cellule                    #
 ########################################################
 
-cell_lecture_de_bits:
+cell_lecture_de_bits: #lit le $a0 eme bit de l entier $a1 
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -179,7 +179,7 @@ addi $sp $sp 12
 jr $ra 
 
 
-cell_mettre_bit_a_1:
+cell_mettre_bit_a_1: #met le $a0 eme bit a 1 de l entier $a1 
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -197,7 +197,7 @@ addi $sp $sp 12
 jr $ra 
 
 
-cell_mettre_bit_a_0:
+cell_mettre_bit_a_0: #met le $a0eme bit de l entier $a1 a 0 
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -262,7 +262,7 @@ jr $ra
 #                      3.2 La pile                     #
 ########################################################
 
-st_creer:
+st_creer: #cree une pile de pouvant contenir $a0 elements 
 #prologue
 addi $sp $sp -8
 sw $ra 0($sp)
@@ -277,13 +277,13 @@ lw $a0 4($sp)
 addi $sp $sp 8
 jr $ra
 
-st_est_vide:
+st_est_vide: #renvoie 1 si la pile est vide 0 sinon 
 #prologue
 addi $sp $sp -8
 sw $ra 0($sp)
 sw $a0 4($sp)       # the stack's address
 #corps
-lw $t0 0($a0)		# if the 1st element (0($a0)) is null then the stack is empty -> $t0
+lw $t0 0($a0)		# if the 1st element (0($a0)) is null then the stack is empty ->$ t0
 beqz $t0 st_vide	# if $t0 is 0 then return 1 -> $v0
 li $v0, 0			# else return 0 -> $v0
 b fin_st_vide
@@ -321,7 +321,7 @@ lw $a0 4($sp)
 addi $sp $sp 8
 jr $ra
 
-st_est_pleine:
+st_est_pleine: #renvoie 1 si le tableau d adresse $a0 est plein 0 sinon 
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -347,7 +347,7 @@ addi $sp $sp 8
 jr $ra
 
 
-st_sommet:
+st_sommet: #retourne la valeur de l element au sommet de la pile 
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -371,7 +371,7 @@ lw $a1 8($sp)
 addi $sp $sp 12
 jr $ra
 
-st_empiler:
+st_empiler: #empile l element $a1 sur la pile d adresse $a0 
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -392,7 +392,7 @@ lw $a1 8($sp)
 addi $sp $sp 12
 jr $ra
 
-st_depiler:
+st_depiler: #depile la pile d adresse $a0 
 #prologue
 addi $sp $sp -8
 sw $ra 0($sp)
@@ -419,7 +419,7 @@ jr $ra
 ########################################################
 
 
-cell_is_visited:
+cell_is_visited: #renvoie 1 si une cellule a ete visitee 0 sinon 
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -439,8 +439,8 @@ lw $a1 8($sp)
 addi $sp $sp 12
 jr $ra
 
-
-cell_visit:
+ 
+cell_visit: #met le 6eme bit a 1 pour indiquer que la cellule a ete visitee 
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -466,7 +466,7 @@ addi $sp $sp 12
 jr $ra
 
 
-init_laby:
+init_laby: #initialise un labyrinthe ou toutes les cellules on 4 mur 
 #prologue
 addi $sp, $sp, -4
 sw $ra, 0($sp) 
@@ -490,7 +490,7 @@ addi $sp $sp 4
 jr $ra
 
 
-affiche_laby:
+affiche_laby: #affiche le labyrinthe d'adresse $a1 
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -525,7 +525,7 @@ addi $sp $sp 12
 jr $ra
 
 
-cell_i_update:
+cell_i_update: # change la valeur de la cellule d'indice $a2 par la valeur de $a0 
 #prologue
 addi $sp $sp -16
 sw $ra 0($sp)
@@ -546,7 +546,7 @@ addi $sp $sp 16
 jr $ra
 
 
-cell_i_data:
+cell_i_data: # renvoie la valeur de la cellule d'index $a2
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -626,7 +626,7 @@ addi $sp $sp 12
 jr $ra
 
 
-lab_neighbouring_cells:
+lab_neighbouring_cells: #renvoie l"adresse du premier element d un tableau contenant l indice de voisins de $a1
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp)
@@ -674,7 +674,7 @@ sw $ra 0($sp)
 addi $sp $sp 12
 jr $ra
 
-lab_visited_neighbours:
+lab_visited_neighbours: # renvoie l adresse du premier element d un tableau contenant les indices des voisins non visitees  de $a1 
 #prologue
 addi $sp $sp -12
 sw $ra 0($sp) 
@@ -745,7 +745,7 @@ addi $sp $sp 12
 jr $ra
 
 
-cell_au_hasard:
+cell_au_hasard: #renvoie l index de la cellule voisine choisit au hasard 
 #prologue
 addi $sp $sp -8
 sw $ra 0($sp)
@@ -787,7 +787,7 @@ jr $ra
 ########################################################
 
                                                                                                                                                                                                                                                                                                                                                                                                                  
-string_to_int:
+string_to_int: #transforme une string en entier 
 #prologue
 addi $sp $sp -8
 sw $ra 0($sp)
