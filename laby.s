@@ -133,8 +133,8 @@ fin_creer_laby: move $a1, $s2   		 # we want to mark the first cell as the depar
 				li $a2, 1				 # the cell is of index 1
 				jal cell_i_data 		 # returns the value of the cell at index 1 ($a2) in the labyrinth ($a1)
 				move $a1, $v0   		 # the value of the cell -> $a1
-				li $a0, 5				 # the 5th bit is the departure bit (B5)
-				jal cell_mettre_bit_a_1  # returns the value of the cell where the 5th bit == 1
+				li $a0, 4				 # the 4th bit is the departure bit (B4)
+				jal cell_mettre_bit_a_1  # returns the value of the cell where the 4th bit == 1
 				move $a0, $v0   		 # the new value of the cell -> $a0
 				move $a1, $s2			 # the labyrinth's address  -> $a1
 				li $a2, 1				 # the index of the cell = 1 -> $a2
@@ -144,8 +144,8 @@ fin_creer_laby: move $a1, $s2   		 # we want to mark the first cell as the depar
 				move $a2, $s1			 # the cell is of index N*N -> $a2
 				jal cell_i_data			 # returns the value of the cell at index N*N ($a2) in the labyrinth ($a1)
 				move $a1, $v0			 # the value of the cell -> $a1
-				li $a0, 4				 # the 4th bit is the departure bit (B4)
-				jal cell_mettre_bit_a_1  # returns the value of the cell where the 4th bit == 1
+				li $a0, 5				 # the 5th bit is the end bit (B5)
+				jal cell_mettre_bit_a_1  # returns the value of the cell where the 5th bit == 1
 				move $a0, $v0			 # the new value of the cell -> $a0
 				move $a1, $s2			 # the labyrinth's address  -> $a1
 				move $a2, $s1		     # the index of the cell = N*N -> $a2
@@ -845,3 +845,4 @@ lw $ra 0($sp)
 lw $a1 4($sp)
 addi $sp $sp 8
 jr $ra
+
