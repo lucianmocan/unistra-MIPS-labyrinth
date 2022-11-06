@@ -755,28 +755,28 @@ addi $sp $sp -8
 sw $ra 0($sp)
 sw $a0 4($sp)   # address of array containing the available neighbours
 #corps
-jal st_est_vide_taille    # the size of the array of neighbours (la taille du tableau des voisins) -> $v0
-move $t2, $v0   # stores the array's size (on sauvegarde la taille contenu en $v0) -> $t2
+li $t2, 4	# 4 index possible at most
 li $a0, 345     # pseudorandom (le pseudorandom) -> $a0
 move $a1, $t2   # upper bound (la borne superieure) -> $a1
 li $v0, 42      # generating the integer (generation d'un entier): 0 <= [int] < $a1 -> $a0 
 syscall
 mul $t1, $a0, 4 # stores the result of random int (on sauvegarde le resultat du random int) -> $t1
-li $t3, 16
+li $t3, 12
 sub $t2 $t3 $t1
 lw $a0 4($sp)   # recovers the address of the array of neighbours (on recupere l'adresse du tableau des voisins) -> $a0
-add $a0 $a0 $t1 # finds the address of the chosen neighbour (on trouve l'adresse du bon element dans le tableau) -> $a0
+add $a0 $a0 $t2 # finds the address of the chosen neighbour (on trouve l'adresse du bon element dans le tableau) -> $a0
 lw $v0 0($a0)   # returns the index of the chosen cell (on retourne l'indice de la cellule choisie au hasard)
 
 check_cell: bnez $v0, fin_hasard   # verifies if the chosen cell's index is not 0, 
 								   # if so goes to the next index in the array of neighbours
-	    bgt $t1 $t3 hasard_restart # if the end of array then go back to the beggining and search until index not zero
+	    bgt $t2 $t3 hasard_restart # if the end of array then go back to the beggining and search until index not zero
 	    addi $a0, $a0, 4		   # else load the value of the index in $v0
-	    addi $t1, $t1, 4
+	    addi $t2, $t2, 4
 	    lw $v0 0($a0)
 	    b check_cell
-	    hasard_restart: sub $a0 $a0 $t1
-	    		    add $t1 $zero $zero
+	    hasard_restart: lw $a0 4($sp)
+	    		    add $t2 $zero $zero
+	    		    lw $v0 0($a0)
 	    b check_cell
 fin_hasard:
 #epilogue
