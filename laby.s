@@ -1,3 +1,7 @@
+###Projet réalisé par MOCAN Lucian et COSMO Tanguy
+### commande pour éxecuter depuis une ligne de commande et écrire le labyrinthe dans un fichier : java -jar Mars4_5.jar main.asm pa <N> | sed '1,2d' | sed '$d' > laby.txt
+### <N> doit être remplacé par le nombre de cellules par ligne souhaité
+
 .data
 
 space: .asciiz " "
